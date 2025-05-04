@@ -19,22 +19,18 @@ export function Header() {
         </nav>
         <div className="flex items-center space-x-1 sm:space-x-2">
            <Button variant="ghost" size="icon" asChild>
+             {/* The Link is the single child required by asChild */}
              <Link href="/experiences">
-               {/* Wrap multiple children in a single element */}
-               <>
-                 <Search className="h-5 w-5" />
-                 <span className="sr-only">Search Experiences</span>
-               </>
+               <Search className="h-5 w-5" />
+               <span className="sr-only">Search Experiences</span>
              </Link>
            </Button>
            <Button asChild className="btn-subtle-animate">
-            <Link href="/experiences/create">
-               {/* Wrap multiple children in a single element */}
-               <>
+            {/* The Link is the single child required by asChild */}
+            <Link href="/experiences/create" className="flex items-center">
                  <PlusCircle className="h-4 w-4 sm:mr-2" />
                  <span className="hidden sm:inline">Create Experience</span>
                  <span className="sr-only sm:hidden">Create Experience</span>
-               </>
             </Link>
           </Button>
           {/* Add Auth buttons here later (Login/Signup/User Profile) */}
