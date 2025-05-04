@@ -80,6 +80,7 @@ let experiencesStore: Experience[] = [
  * Simulates an async database call.
  */
 export async function getAllExperiences(): Promise<Experience[]> {
+  console.log('getAllExperiences called. Returning:', experiencesStore.length, 'experiences');
   // Simulate async delay
   await new Promise(resolve => setTimeout(resolve, 50));
   // Return a copy to prevent direct modification of the store
@@ -112,6 +113,7 @@ const MOCK_USER_NAME = 'Current User'; // Replace with actual username
 export async function _addExperienceInternal(
     experienceData: Omit<Experience, 'id' | 'attendees' | 'creatorId' | 'creatorName'>
 ): Promise<Experience> {
+    console.log('_addExperienceInternal called with data:', experienceData);
     // Simulate async delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -126,6 +128,7 @@ export async function _addExperienceInternal(
     experiencesStore.unshift(newExperience); // Add to the beginning of the array
     console.log('Added new experience:', newExperience);
     console.log('Current store size:', experiencesStore.length);
+    console.log('Current store content:', experiencesStore); // Log entire store after adding
     return { ...newExperience }; // Return a copy
 }
 
