@@ -20,15 +20,21 @@ export function Header() {
         <div className="flex items-center space-x-1 sm:space-x-2">
            <Button variant="ghost" size="icon" asChild>
              <Link href="/experiences">
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search Experiences</span>
+               {/* Wrap multiple children in a single element */}
+               <>
+                 <Search className="h-5 w-5" />
+                 <span className="sr-only">Search Experiences</span>
+               </>
              </Link>
            </Button>
            <Button asChild className="btn-subtle-animate">
             <Link href="/experiences/create">
-              <PlusCircle className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Create Experience</span>
-              <span className="sr-only sm:hidden">Create Experience</span>
+               {/* Wrap multiple children in a single element */}
+               <>
+                 <PlusCircle className="h-4 w-4 sm:mr-2" />
+                 <span className="hidden sm:inline">Create Experience</span>
+                 <span className="sr-only sm:hidden">Create Experience</span>
+               </>
             </Link>
           </Button>
           {/* Add Auth buttons here later (Login/Signup/User Profile) */}
