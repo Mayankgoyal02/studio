@@ -22,7 +22,7 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from 'next/navigation'; // Use next/navigation for App Router
+import { useRouter, isRedirectError } from 'next/navigation'; // Use next/navigation for App Router and error checking
 import { createExperienceAction } from '@/app/actions'; // Import the server action
 import { useState } from 'react'; // Import useState for loading state
 
@@ -93,8 +93,8 @@ export default function CreateExperiencePage() {
       const result = await createExperienceAction(formData);
       console.log("Client: Received result from server action:", result);
 
-      // Server action handles successful redirection.
-      // We only need to handle errors returned *without* redirecting.
+      // Server action handles successful redirection via throwing a redirect error.
+      // Handle only explicit non-success results returned from the action here.
       if (result && !result.success) {
          toast({
            title: 'Error Creating Experience',
@@ -116,34 +116,39 @@ export default function CreateExperiencePage() {
                 }
             });
          }
-      } else if (result?.success === true) { // Check for explicit success if result is returned
-          // Show success toast before potential redirection (handled by action)
-          toast({
-             title: 'Experience Created!',
-             description: `"${data.title}" is being listed.`,
-             variant: 'default',
-          });
-          // Note: Redirect is handled by the server action, no need to call router.push here
-      } else if (result === undefined) {
-          // This means the redirect happened successfully in the server action
-          // No further client-side action needed, maybe a success toast was already shown
-          console.log("Client: Server action likely redirected successfully.");
       }
+      // NOTE: If the action succeeds and redirects, it will throw an error
+      // caught by the `catch` block below. We don't need an explicit success case here.
 
     } catch (error) {
-      // Catch unexpected errors during action execution (e.g., network issues)
-      console.error("Client: Unexpected error during form submission:", error);
-      toast({
-        title: 'An Unexpected Error Occurred',
-        description: 'Could not create experience. Please try again.',
-        variant: 'destructive',
-      });
+      // Catch errors during action execution
+      // Check if it's a redirect error thrown by the server action
+      if (isRedirectError(error)) {
+         // Redirect is happening, show success toast.
+         toast({
+             title: 'Experience Created!',
+             description: `"${data.title}" has been listed. Redirecting...`,
+             variant: 'default',
+          });
+         // Re-throw the error to let Next.js handle the actual redirect.
+         // DO NOT call router.push() here.
+         throw error;
+      } else {
+        // Handle unexpected errors (e.g., network issues, server crashes)
+        console.error("Client: Unexpected error during form submission:", error);
+        toast({
+          title: 'An Unexpected Error Occurred',
+          description: 'Could not create experience. Please try again.',
+          variant: 'destructive',
+        });
+      }
     } finally {
-      setIsSubmitting(false); // Reset loading state
+      setIsSubmitting(false); // Reset loading state regardless of outcome
     }
   }
 
   // Helper function to handle potential server-side errors on the form
+  // Note: This might be redundant now if server errors are set directly in onSubmit
   const handleServerErrors = (errors: FieldErrors<ExperienceFormValues> | null | undefined) => {
       if (!errors) return;
       Object.entries(errors).forEach(([field, errorArray]) => {
