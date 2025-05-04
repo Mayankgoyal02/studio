@@ -93,9 +93,9 @@ export default function CreateExperiencePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
-      <h1 className="text-3xl font-bold tracking-tight mb-8 text-center">Create a New Experience</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8 text-center">Create a New Experience</h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
           {/* Title */}
           <FormField
             control={form.control}
@@ -106,7 +106,7 @@ export default function CreateExperiencePage() {
                 <FormControl>
                   <Input placeholder="e.g., Hiking Trip to Bear Mountain" {...field} />
                 </FormControl>
-                <FormDescription>Give your experience a catchy title.</FormDescription>
+                <FormDescription className="text-xs sm:text-sm">Give your experience a catchy title.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -122,18 +122,18 @@ export default function CreateExperiencePage() {
                 <FormControl>
                   <Textarea
                     placeholder="Tell potential buddies more about the experience..."
-                    className="resize-y min-h-[100px]"
+                    className="resize-y min-h-[100px] sm:min-h-[120px]"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>Include details like what to expect, what to bring, etc.</FormDescription>
+                <FormDescription className="text-xs sm:text-sm">Include details like what to expect, what to bring, etc.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
           {/* Date and Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
              {/* Date */}
             <FormField
               control={form.control}
@@ -170,6 +170,7 @@ export default function CreateExperiencePage() {
                       />
                     </PopoverContent>
                   </Popover>
+                   <FormDescription className="text-xs sm:text-sm">When is it happening?</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -184,6 +185,7 @@ export default function CreateExperiencePage() {
                     <FormControl>
                     <Input type="time" placeholder="e.g., 19:00" {...field} />
                     </FormControl>
+                     <FormDescription className="text-xs sm:text-sm">What time does it start?</FormDescription>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -201,7 +203,7 @@ export default function CreateExperiencePage() {
                 <FormControl>
                   <Input placeholder="e.g., Central Park, NYC or Online" {...field} />
                 </FormControl>
-                <FormDescription>Where will the experience take place?</FormDescription>
+                <FormDescription className="text-xs sm:text-sm">Where will the experience take place?</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -226,7 +228,7 @@ export default function CreateExperiencePage() {
                     ))}
                   </SelectContent>
                 </Select>
-                 <FormDescription>Help others find your experience.</FormDescription>
+                 <FormDescription className="text-xs sm:text-sm">Help others find your experience.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -242,7 +244,7 @@ export default function CreateExperiencePage() {
                 <FormControl>
                   <Input placeholder="https://example.com/image.jpg" {...field} />
                 </FormControl>
-                <FormDescription>Add an image link to make your listing stand out.</FormDescription>
+                <FormDescription className="text-xs sm:text-sm">Add an image link to make your listing stand out.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

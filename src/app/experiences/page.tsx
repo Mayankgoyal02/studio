@@ -133,14 +133,14 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-3xl font-bold tracking-tight mb-8 text-center">Find Your Next Experience Buddy</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8 text-center">Find Your Next Experience Buddy</h1>
 
       {/* Search and Filter Form */}
       {/* Using GET method for simple filtering via URL params */}
       <form method="GET" action="/experiences" className="mb-8 p-4 border rounded-lg bg-card shadow">
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
            {/* Keyword Search */}
-           <div className="space-y-1">
+           <div className="space-y-1 col-span-1 sm:col-span-2 lg:col-span-1">
              <label htmlFor="query" className="text-sm font-medium">Keyword</label>
             <Input
               id="query"
@@ -182,7 +182,7 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
 
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full sm:w-auto btn-subtle-animate">
+          <Button type="submit" className="w-full sm:w-auto btn-subtle-animate col-span-1 sm:col-span-2 lg:col-span-1">
             <Search className="mr-2 h-4 w-4" /> Search
           </Button>
            {/* Add More Filters Button (Future) */}

@@ -27,7 +27,8 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
 
   let formattedDate = 'Invalid Date';
   try {
-     formattedDate = format(new Date(experience.date), 'PPP'); // Format date nicely, e.g., "Jun 15, 2024"
+     // Use a shorter format for smaller cards
+     formattedDate = format(new Date(experience.date), 'PP'); // Format date nicely, e.g., "Jun 15, 2024"
   } catch (error) {
     console.error("Error formatting date:", experience.date, error);
     // Keep formattedDate as 'Invalid Date'
@@ -36,46 +37,46 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden h-full transition-shadow duration-200 hover:shadow-lg">
       {experience.imageUrl && (
-         <div className="relative w-full h-48">
+         <div className="relative w-full h-40 sm:h-48"> {/* Adjusted height */}
           <Image
             src={experience.imageUrl}
             alt={experience.title}
             fill // Use fill for responsive images within a relative parent
             style={{ objectFit: 'cover' }} // Ensure the image covers the area
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" // Adjusted sizes
             data-ai-hint={`${experience.category} event`} // AI Hint for image search
             priority={false} // Don't prioritize images in a list by default
           />
          </div>
       )}
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg leading-tight mb-1">{experience.title}</CardTitle>
-         <div className="flex items-center text-sm text-muted-foreground mb-2">
-          <User className="mr-1.5 h-4 w-4 flex-shrink-0" />
-          <span>Hosted by {experience.creatorName}</span>
+      <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4"> {/* Adjusted padding */}
+        <CardTitle className="text-base sm:text-lg leading-tight mb-1 line-clamp-2">{experience.title}</CardTitle>
+         <div className="flex items-center text-xs sm:text-sm text-muted-foreground mb-2">
+          <User className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">Hosted by {experience.creatorName}</span>
         </div>
-        <CardDescription className="line-clamp-2 text-sm">{experience.description}</CardDescription>
+        <CardDescription className="line-clamp-2 text-xs sm:text-sm">{experience.description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow space-y-2 text-sm text-muted-foreground">
+      <CardContent className="flex-grow p-4 pt-2 sm:p-6 sm:pt-2 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground"> {/* Adjusted padding & spacing */}
         <div className="flex items-center">
-          <Calendar className="mr-1.5 h-4 w-4 flex-shrink-0" />
+          <Calendar className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
           <span>{formattedDate}</span>
         </div>
         <div className="flex items-center">
-          <Clock className="mr-1.5 h-4 w-4 flex-shrink-0" />
+          <Clock className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
           <span>{experience.time}</span>
         </div>
         <div className="flex items-center">
-          <MapPin className="mr-1.5 h-4 w-4 flex-shrink-0" />
-          <span>{experience.location}</span>
+          <MapPin className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{experience.location}</span> {/* Added truncate */}
         </div>
          <div className="flex items-center pt-1">
-          <CategoryIcon className="mr-1.5 h-4 w-4 flex-shrink-0 text-primary" />
-          <Badge variant="secondary">{experience.category}</Badge>
+          <CategoryIcon className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-primary" />
+          <Badge variant="secondary" className="text-xs">{experience.category}</Badge> {/* Keep badge text small */}
         </div>
       </CardContent>
-      <CardFooter>
-        <Button asChild className="w-full btn-subtle-animate" variant="outline">
+      <CardFooter className="p-4 pt-0 sm:p-6 sm:pt-0"> {/* Adjusted padding */}
+        <Button asChild className="w-full btn-subtle-animate" variant="outline" size="sm"> {/* Use smaller button size */}
           <Link href={`/experiences/${experience.id}`}>
             View Details
           </Link>

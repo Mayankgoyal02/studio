@@ -135,13 +135,13 @@ export default async function ExperienceDetailPage({ params }: { params: { id: s
          {/* Left Column (Image & Actions) */}
         <div className="md:col-span-1 space-y-6">
           {experience.imageUrl && (
-            <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-md">
+            <div className="relative w-full aspect-video sm:aspect-[4/3] rounded-lg overflow-hidden shadow-md">
               <Image
                 src={experience.imageUrl}
                 alt={experience.title}
                 fill
                  style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                  data-ai-hint={`${experience.category} event detail`}
                  priority // Prioritize the main image on the detail page
               />
@@ -195,14 +195,14 @@ export default async function ExperienceDetailPage({ params }: { params: { id: s
          <div className="md:col-span-2 space-y-6">
            {/* Title and Meta */}
            <div className="border-b pb-4 mb-6">
-             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">{experience.title}</h1>
-              <div className="flex items-center text-md text-muted-foreground mb-3">
-                <User className="mr-1.5 h-5 w-5 flex-shrink-0" />
+             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2">{experience.title}</h1>
+              <div className="flex items-center text-sm sm:text-md text-muted-foreground mb-3">
+                <User className="mr-1.5 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 <span>Hosted by <span className="font-medium text-foreground">{experience.creatorName}</span></span>
              </div>
               <div className="flex items-center">
-                  <CategoryIcon className="mr-1.5 h-5 w-5 flex-shrink-0 text-primary" />
-                  <Badge variant="secondary" className="text-sm">{experience.category}</Badge>
+                  <CategoryIcon className="mr-1.5 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-primary" />
+                  <Badge variant="secondary" className="text-xs sm:text-sm">{experience.category}</Badge>
              </div>
            </div>
 
@@ -210,23 +210,23 @@ export default async function ExperienceDetailPage({ params }: { params: { id: s
            {/* Details Card */}
             <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Details</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">Details</CardTitle>
                 </CardHeader>
-                 <CardContent className="space-y-4 text-base">
+                 <CardContent className="space-y-4 text-sm sm:text-base">
                     <div className="flex items-start">
-                      <Calendar className="mr-3 h-5 w-5 flex-shrink-0 text-muted-foreground mt-1" />
+                      <Calendar className="mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-muted-foreground mt-1" />
                       <div>
                         <span className="font-medium">Date:</span> {formattedDate}
                      </div>
                     </div>
                     <div className="flex items-start">
-                      <Clock className="mr-3 h-5 w-5 flex-shrink-0 text-muted-foreground mt-1" />
+                      <Clock className="mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-muted-foreground mt-1" />
                       <div>
                          <span className="font-medium">Time:</span> {experience.time}
                       </div>
                     </div>
                      <div className="flex items-start">
-                      <MapPin className="mr-3 h-5 w-5 flex-shrink-0 text-muted-foreground mt-1" />
+                      <MapPin className="mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-muted-foreground mt-1" />
                       <div>
                          <span className="font-medium">Location:</span> {experience.location}
                       </div>
@@ -237,17 +237,17 @@ export default async function ExperienceDetailPage({ params }: { params: { id: s
             {/* Description Card */}
              <Card>
                 <CardHeader>
-                    <CardTitle className="text-xl">About this Experience</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl">About this Experience</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {/* Use whitespace-pre-wrap to respect newlines in the description */}
-                    <p className="text-base text-foreground whitespace-pre-wrap">{experience.description}</p>
+                    <p className="text-sm sm:text-base text-foreground whitespace-pre-wrap">{experience.description}</p>
                 </CardContent>
              </Card>
 
            {/* Back Button */}
            <div className="mt-8">
-             <Button variant="outline" asChild>
+             <Button variant="outline" asChild className="w-full sm:w-auto">
                <Link href="/experiences">← Back to Experiences</Link>
              </Button>
            </div>

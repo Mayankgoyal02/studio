@@ -69,17 +69,17 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tighter text-primary sm:text-5xl md:text-6xl lg:text-7xl">
               Never Experience Alone Again
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+            <p className="mt-4 text-base text-muted-foreground sm:text-lg md:text-xl">
               Find friendly buddies to share your favorite activities, concerts, trips, and more.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="btn-subtle-animate bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button asChild size="lg" className="btn-subtle-animate bg-accent text-accent-foreground hover:bg-accent/90 w-full sm:w-auto">
                 <Link href="/experiences">
                   Find Experiences
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="btn-subtle-animate">
+              <Button asChild size="lg" variant="outline" className="btn-subtle-animate w-full sm:w-auto">
                 <Link href="/experiences/create">
                   Create an Experience
                 </Link>
@@ -92,7 +92,7 @@ export default function Home() {
       {/* Featured Experiences Section */}
       <section className="py-12 md:py-20 bg-secondary">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter text-center mb-8 md:mb-12">
+          <h2 className="text-2xl font-bold tracking-tighter text-center sm:text-3xl mb-8 md:mb-12">
             Featured Experiences
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -101,7 +101,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-12 text-center">
-            <Button asChild variant="link" className="text-primary text-lg">
+            <Button asChild variant="link" className="text-primary text-base sm:text-lg">
               <Link href="/experiences">
                 See All Experiences <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -113,28 +113,28 @@ export default function Home() {
       {/* How it Works Section (Optional) */}
        <section className="py-12 md:py-20">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter text-center mb-8 md:mb-12">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <h2 className="text-2xl font-bold tracking-tighter text-center sm:text-3xl mb-8 md:mb-12">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 text-center">
             <div className="flex flex-col items-center">
                <div className="p-4 rounded-full bg-primary/10 mb-4">
-                 <Search className="h-10 w-10 text-primary" />
+                 <Search className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                </div>
-              <h3 className="text-xl font-semibold mb-2">1. Find Experiences</h3>
-              <p className="text-muted-foreground">Browse or search for activities you're interested in.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">1. Find Experiences</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">Browse or search for activities you're interested in.</p>
             </div>
             <div className="flex flex-col items-center">
                <div className="p-4 rounded-full bg-primary/10 mb-4">
-                <Users className="h-10 w-10 text-primary" />
+                <Users className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                </div>
-              <h3 className="text-xl font-semibold mb-2">2. Connect with Buddies</h3>
-              <p className="text-muted-foreground">Show interest and connect with the host and other attendees.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">2. Connect with Buddies</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">Show interest and connect with the host and other attendees.</p>
             </div>
             <div className="flex flex-col items-center">
                <div className="p-4 rounded-full bg-primary/10 mb-4">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-party-popper h-10 w-10 text-primary"><path d="M5.77 7.43A1.5 1.5 0 0 1 7.2 6.1l1.63.5A1.5 1.5 0 0 1 10.3 8l.5 1.62a1.5 1.5 0 0 1-1.43 1.88l-1.6-.4a1.5 1.5 0 0 1-1.8-1.5l-.3-1.56Z"/><path d="m12.3 15.7 1.63.5a1.5 1.5 0 0 1 1.43 1.88l-.5 1.62a1.5 1.5 0 0 1-1.87 1.43l-1.63-.5a1.5 1.5 0 0 1-1.43-1.88l.5-1.62a1.5 1.5 0 0 1 1.87-1.43Z"/><path d="M11 6V3"/><path d="M7 12H4"/><path d="m18 8 2-2"/><path d="m6 6-2-2"/><path d="m18 16 2 2"/><path d="m6 18-2 2"/><path d="M13 21v-3"/><path d="M17 12h3"/></svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-party-popper h-8 w-8 sm:h-10 sm:w-10 text-primary"><path d="M5.77 7.43A1.5 1.5 0 0 1 7.2 6.1l1.63.5A1.5 1.5 0 0 1 10.3 8l.5 1.62a1.5 1.5 0 0 1-1.43 1.88l-1.6-.4a1.5 1.5 0 0 1-1.8-1.5l-.3-1.56Z"/><path d="m12.3 15.7 1.63.5a1.5 1.5 0 0 1 1.43 1.88l-.5 1.62a1.5 1.5 0 0 1-1.87 1.43l-1.63-.5a1.5 1.5 0 0 1-1.43-1.88l.5-1.62a1.5 1.5 0 0 1 1.87-1.43Z"/><path d="M11 6V3"/><path d="M7 12H4"/><path d="m18 8 2-2"/><path d="m6 6-2-2"/><path d="m18 16 2 2"/><path d="m6 18-2 2"/><path d="M13 21v-3"/><path d="M17 12h3"/></svg>
                </div>
-              <h3 className="text-xl font-semibold mb-2">3. Enjoy Together</h3>
-              <p className="text-muted-foreground">Meet up and share the experience!</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">3. Enjoy Together</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">Meet up and share the experience!</p>
             </div>
           </div>
         </div>
