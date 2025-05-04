@@ -1,7 +1,7 @@
 'use client'; // Required for form handling with react-hook-form
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,16 +26,18 @@ import { useRouter } from 'next/navigation'; // Use next/navigation for App Rout
 import { createExperienceAction } from '@/app/actions'; // Import the server action
 import { useState } from 'react'; // Import useState for loading state
 
-// Define available categories
+// Define available categories (consider moving to a shared constants file)
 const categories = ['Music', 'Sports', 'Travel', 'Food', 'Arts', 'Other'];
 
-// Define Zod schema for form validation (ensure it matches server action schema)
+// Define Zod schema for *client-side* form validation
 const experienceFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }).max(100),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }).max(500),
+  // Use z.date() for client-side calendar interaction
   date: z.date({ required_error: 'A date for the experience is required.' }),
   time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'Invalid time format (HH:MM).' }), // HH:MM format
   location: z.string().min(3, { message: 'Location must be at least 3 characters.' }).max(100),
+  // Use the full category name for selection, ensure it's one of the valid options
   category: z.string({ required_error: 'Please select a category.' }).refine(val => categories.includes(val), { message: "Invalid category selected." }),
   imageUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')), // Optional image URL
 });
@@ -56,7 +58,7 @@ export default function CreateExperiencePage() {
       location: '',
       category: undefined,
       imageUrl: '',
-      // date will be set by the Calendar component
+      date: undefined, // Date is initially undefined
     },
     mode: 'onChange', // Validate on change
   });
@@ -64,50 +66,73 @@ export default function CreateExperiencePage() {
   // Handle form submission using the server action
   async function onSubmit(data: ExperienceFormValues) {
     setIsSubmitting(true); // Set loading state
+    form.clearErrors(); // Clear previous errors
 
-    // Convert date to string before sending, as FormData doesn't handle Date objects directly
+    // Create FormData to send to the server action
     const formData = new FormData();
+
+    // Iterate over validated data and append to FormData
     Object.entries(data).forEach(([key, value]) => {
        if (key === 'date' && value instanceof Date) {
-            // Format date appropriately, ISO string is often good, or YYYY-MM-DD
-            // The server action expects a string that can be parsed by `new Date()`
+            // Convert the Date object to an ISO string (UTC) for the server action
             formData.append(key, value.toISOString());
+       } else if (key === 'category' && typeof value === 'string'){
+            // Send category value as is (e.g., "Music")
+            formData.append(key, value);
         } else if (value !== undefined && value !== null) {
+           // Append other values as strings
            formData.append(key, String(value));
        }
     });
 
-     console.log("Submitting form data:", Object.fromEntries(formData.entries()));
+     console.log("Client: Submitting form data:", Object.fromEntries(formData.entries()));
 
 
     try {
       // Call the server action
-      // The action handles validation, creation, revalidation, and redirection
       const result = await createExperienceAction(formData);
+      console.log("Client: Received result from server action:", result);
 
-      // Server action handles success redirection.
-      // We only need to handle potential errors returned *without* redirecting.
+      // Server action handles successful redirection.
+      // We only need to handle errors returned *without* redirecting.
       if (result && !result.success) {
          toast({
            title: 'Error Creating Experience',
            description: result.message || 'Please check the form for errors.',
            variant: 'destructive',
          });
-         // TODO: Optionally map result.errors back to form fields
-         // e.g., if (result.errors?.title) form.setError('title', { message: result.errors.title[0] });
-      } else {
-          // Show success toast before redirection (though redirection might happen very quickly)
+
+         // Map server-side validation errors back to form fields
+         if (result.errors) {
+            Object.entries(result.errors).forEach(([field, messages]) => {
+                // Ensure field exists in the form schema before setting error
+                if (field in form.getValues()) {
+                    form.setError(field as keyof ExperienceFormValues, {
+                        type: 'server',
+                        message: messages?.join(', ') // Join multiple error messages if any
+                    });
+                } else {
+                    console.warn(`Server returned error for unknown field: ${field}`);
+                }
+            });
+         }
+      } else if (result?.success === true) { // Check for explicit success if result is returned
+          // Show success toast before potential redirection (handled by action)
           toast({
              title: 'Experience Created!',
              description: `"${data.title}" is being listed.`,
              variant: 'default',
           });
-          // Note: Redirect is handled by the server action
+          // Note: Redirect is handled by the server action, no need to call router.push here
+      } else if (result === undefined) {
+          // This means the redirect happened successfully in the server action
+          // No further client-side action needed, maybe a success toast was already shown
+          console.log("Client: Server action likely redirected successfully.");
       }
 
     } catch (error) {
-      // Catch unexpected errors during action execution
-      console.error("Unexpected error during form submission:", error);
+      // Catch unexpected errors during action execution (e.g., network issues)
+      console.error("Client: Unexpected error during form submission:", error);
       toast({
         title: 'An Unexpected Error Occurred',
         description: 'Could not create experience. Please try again.',
@@ -117,6 +142,18 @@ export default function CreateExperiencePage() {
       setIsSubmitting(false); // Reset loading state
     }
   }
+
+  // Helper function to handle potential server-side errors on the form
+  const handleServerErrors = (errors: FieldErrors<ExperienceFormValues> | null | undefined) => {
+      if (!errors) return;
+      Object.entries(errors).forEach(([field, errorArray]) => {
+         const fieldName = field as keyof ExperienceFormValues;
+         if (form.getValues(fieldName) !== undefined && errorArray && errorArray.length > 0) {
+           form.setError(fieldName, { type: 'server', message: errorArray[0] });
+         }
+      });
+  };
+
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
@@ -175,7 +212,7 @@ export default function CreateExperiencePage() {
                         <Button
                           variant={'outline'}
                           className={cn(
-                            'w-full pl-3 text-left font-normal',
+                            'w-full pl-3 text-left font-normal justify-start', // Ensure text alignment
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -192,7 +229,10 @@ export default function CreateExperiencePage() {
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
+                        onSelect={(date) => {
+                           field.onChange(date); // Update form state
+                           console.log("Date selected:", date?.toISOString()); // Log the ISO string
+                        }}
                         disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} // Disable past dates
                         initialFocus
                       />
@@ -252,6 +292,7 @@ export default function CreateExperiencePage() {
                   </FormControl>
                   <SelectContent>
                     {categories.map(cat => (
+                       // Use the full category name as the value
                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
@@ -281,7 +322,7 @@ export default function CreateExperiencePage() {
 
 
           {/* Submit Button */}
-          {/* Use the local isSubmitting state */}
+          {/* Disable button while submitting */}
           <Button type="submit" className="w-full btn-subtle-animate" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Create Experience'}
           </Button>
