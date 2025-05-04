@@ -75,8 +75,8 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           <Badge variant="secondary" className="text-xs">{experience.category}</Badge> {/* Keep badge text small */}
         </div>
       </CardContent>
-      <CardFooter className="p-4 pt-0 sm:p-6 sm:pt-0"> {/* Adjusted padding */}
-        <Button asChild className="w-full btn-subtle-animate" variant="outline" size="sm"> {/* Use smaller button size */}
+      <CardFooter className="p-4 pt-0 sm:p-6 sm:pt-0">
+        <Button asChild className="w-full btn-subtle-animate" variant="outline" size="sm">
           <Link href={`/experiences/${experience.id}`}>
             View Details
           </Link>
