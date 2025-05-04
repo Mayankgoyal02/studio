@@ -23,11 +23,13 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation'; // Use next/navigation for App Router
+import { createExperienceAction } from '@/app/actions'; // Import the server action
+import { useState } from 'react'; // Import useState for loading state
 
 // Define available categories
 const categories = ['Music', 'Sports', 'Travel', 'Food', 'Arts', 'Other'];
 
-// Define Zod schema for form validation
+// Define Zod schema for form validation (ensure it matches server action schema)
 const experienceFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }).max(100),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }).max(500),
@@ -40,13 +42,11 @@ const experienceFormSchema = z.object({
 
 type ExperienceFormValues = z.infer<typeof experienceFormSchema>;
 
-// TODO: Replace with actual user ID from authentication
-const MOCK_USER_ID = 'mockUser123';
-const MOCK_USER_NAME = 'Current User'; // Replace with actual username
-
 export default function CreateExperiencePage() {
   const { toast } = useToast();
-   const router = useRouter();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false); // Local loading state
+
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceFormSchema),
     defaultValues: {
@@ -61,40 +61,68 @@ export default function CreateExperiencePage() {
     mode: 'onChange', // Validate on change
   });
 
-  // TODO: Implement actual submission logic (e.g., call an API endpoint or Server Action)
+  // Handle form submission using the server action
   async function onSubmit(data: ExperienceFormValues) {
-     console.log("Submitting data:", data);
+    setIsSubmitting(true); // Set loading state
 
-     // Simulate API call / Server Action
-     await new Promise(resolve => setTimeout(resolve, 1000));
-
-     // Construct the new experience object (basic example)
-     const newExperience = {
-         id: Date.now().toString(), // Temporary ID generation
-         ...data,
-         date: data.date.toISOString(), // Convert date to string for storage/API
-         creatorId: MOCK_USER_ID,
-         creatorName: MOCK_USER_NAME,
-         attendees: [],
-     };
-
-     console.log("Simulated new experience:", newExperience);
-
-    toast({
-      title: 'Experience Created!',
-      description: `"${data.title}" has been listed.`,
-      variant: 'default', // Use 'default' or omit for standard toast
+    // Convert date to string before sending, as FormData doesn't handle Date objects directly
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+       if (key === 'date' && value instanceof Date) {
+            // Format date appropriately, ISO string is often good, or YYYY-MM-DD
+            // The server action expects a string that can be parsed by `new Date()`
+            formData.append(key, value.toISOString());
+        } else if (value !== undefined && value !== null) {
+           formData.append(key, String(value));
+       }
     });
 
-    // Redirect to the newly created experience page (or the main list)
-    // router.push(`/experiences/${newExperience.id}`); // Ideal redirect
-     router.push('/experiences'); // Redirect to list for now
+     console.log("Submitting form data:", Object.fromEntries(formData.entries()));
+
+
+    try {
+      // Call the server action
+      // The action handles validation, creation, revalidation, and redirection
+      const result = await createExperienceAction(formData);
+
+      // Server action handles success redirection.
+      // We only need to handle potential errors returned *without* redirecting.
+      if (result && !result.success) {
+         toast({
+           title: 'Error Creating Experience',
+           description: result.message || 'Please check the form for errors.',
+           variant: 'destructive',
+         });
+         // TODO: Optionally map result.errors back to form fields
+         // e.g., if (result.errors?.title) form.setError('title', { message: result.errors.title[0] });
+      } else {
+          // Show success toast before redirection (though redirection might happen very quickly)
+          toast({
+             title: 'Experience Created!',
+             description: `"${data.title}" is being listed.`,
+             variant: 'default',
+          });
+          // Note: Redirect is handled by the server action
+      }
+
+    } catch (error) {
+      // Catch unexpected errors during action execution
+      console.error("Unexpected error during form submission:", error);
+      toast({
+        title: 'An Unexpected Error Occurred',
+        description: 'Could not create experience. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false); // Reset loading state
+    }
   }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8 text-center">Create a New Experience</h1>
       <Form {...form}>
+        {/* Update form tag to use the onSubmit handler */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
           {/* Title */}
           <FormField
@@ -152,7 +180,7 @@ export default function CreateExperiencePage() {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, 'PPP')
+                            format(field.value, 'PPP') // 'PPP' -> Oct 20, 2023
                           ) : (
                             <span>Pick a date</span>
                           )}
@@ -242,7 +270,8 @@ export default function CreateExperiencePage() {
               <FormItem>
                 <FormLabel>Image URL (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://example.com/image.jpg" {...field} />
+                  {/* Ensure field value is handled correctly (might be null/undefined initially) */}
+                  <Input placeholder="https://example.com/image.jpg" {...field} value={field.value ?? ''} />
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm">Add an image link to make your listing stand out.</FormDescription>
                 <FormMessage />
@@ -252,8 +281,9 @@ export default function CreateExperiencePage() {
 
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full btn-subtle-animate" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Creating...' : 'Create Experience'}
+          {/* Use the local isSubmitting state */}
+          <Button type="submit" className="w-full btn-subtle-animate" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Create Experience'}
           </Button>
         </form>
       </Form>

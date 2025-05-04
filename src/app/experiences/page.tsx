@@ -3,86 +3,27 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import type { Experience } from '@/lib/types';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { getAllExperiences } from '@/lib/data'; // Import from data store
+import { redirect } from 'next/navigation'; // Import redirect for server action
 
-// TODO: Replace with actual data fetching and filtering logic
-async function getExperiences(searchParams: { [key: string]: string | string[] | undefined }): Promise<Experience[]> {
-  console.log("Search Params:", searchParams); // Log received params
-  // Simulate fetching data
-  const allExperiences: Experience[] = [
-    {
-      id: '1',
-      title: 'Summer Music Fest',
-      description: 'Looking for someone to join me at the annual Summer Music Fest. Great bands, good vibes!',
-      date: '2024-07-20T00:00:00Z',
-      time: '14:00',
-      location: 'Central Park',
-      category: 'Music',
-      imageUrl: 'https://picsum.photos/seed/musicfest/600/400',
-      creatorId: 'user123',
-      creatorName: 'Alex',
-      attendees: [],
-    },
-    {
-      id: '2',
-      title: 'Weekend Hiking Trip',
-      description: 'Planning a scenic hike this weekend. Need a buddy who enjoys nature and a good walk.',
-      date: '2024-07-13T00:00:00Z',
-      time: '09:00',
-      location: 'Mountain View Trail',
-      category: 'Sports',
-      imageUrl: 'https://picsum.photos/seed/hiking/600/400',
-      creatorId: 'user456',
-      creatorName: 'Sam',
-      attendees: ['user789'],
-    },
-     {
-      id: '3',
-      title: 'New Italian Restaurant Opening',
-      description: 'Want to check out the new Italian place downtown? Looking for a fellow foodie!',
-      date: '2024-07-18T00:00:00Z',
-      time: '19:30',
-      location: 'Downtown Eats',
-      category: 'Food',
-      imageUrl: 'https://picsum.photos/seed/foodie/600/400',
-      creatorId: 'user101',
-      creatorName: 'Chloe',
-      attendees: [],
-    },
-    {
-      id: '4',
-      title: 'Art Gallery Visit',
-      description: 'Exploring the modern art gallery next Saturday. Anyone interested in joining?',
-      date: '2024-07-27T00:00:00Z',
-      time: '11:00',
-      location: 'City Art Gallery',
-      category: 'Arts',
-      imageUrl: 'https://picsum.photos/seed/artgallery/600/400',
-      creatorId: 'user555',
-      creatorName: 'Maria',
-      attendees: [],
-    },
-     {
-      id: '5',
-      title: 'Travel Buddy for Europe Trip',
-      description: 'Planning a 2-week backpacking trip through Europe in August. Seeking a travel companion.',
-      date: '2024-08-05T00:00:00Z', // Represents start date
-      time: 'N/A',
-      location: 'Europe (Multiple)',
-      category: 'Travel',
-      imageUrl: 'https://picsum.photos/seed/europetrip/600/400',
-      creatorId: 'user999',
-      creatorName: 'Ben',
-      attendees: [],
-    },
-  ];
 
-  // Basic filtering simulation
-  let filteredExperiences = allExperiences;
+// Define available categories for filtering
+const categories = ['All', 'Music', 'Sports', 'Travel', 'Food', 'Arts', 'Other'];
+
+
+// Server component to fetch and display experiences
+export default async function ExperiencesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+
+  // Fetch all experiences initially
+  const allExperiences = await getAllExperiences();
+
+  // Apply filtering based on searchParams
   const query = searchParams?.query as string | undefined;
   const category = searchParams?.category as string | undefined;
   const location = searchParams?.location as string | undefined;
-  // Add date filtering later
+
+  let filteredExperiences = allExperiences;
 
   if (query) {
     filteredExperiences = filteredExperiences.filter(exp =>
@@ -98,19 +39,7 @@ async function getExperiences(searchParams: { [key: string]: string | string[] |
   }
 
 
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-
-  return filteredExperiences;
-}
-
-// Define available categories
-const categories = ['All', 'Music', 'Sports', 'Travel', 'Food', 'Arts'];
-
-export default async function ExperiencesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-  const experiences = await getExperiences(searchParams);
-
-  // We need a server action to handle form submission and redirect with query params
+  // Server action to handle form submission and redirect with query params
   async function handleSearch(formData: FormData) {
     'use server';
     const query = formData.get('query') as string || '';
@@ -122,11 +51,7 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
     if (category && category !== 'all') params.set('category', category);
     if (location) params.set('location', location);
 
-    // Use redirect from next/navigation - needs to be done client-side or handled differently server-side.
-    // For now, let's rely on the form's default GET behavior by adding inputs.
-    // Or, use a client component wrapper for the form. Let's stick to server for now.
-    // We will rebuild the URL and redirect server-side (less ideal for UX but works without client JS for now)
-    const { redirect } = await import('next/navigation');
+    // Redirect with the new search parameters
     redirect(`/experiences?${params.toString()}`);
   }
 
@@ -135,9 +60,8 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
     <div className="container mx-auto px-4 py-8 md:py-12">
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8 text-center">Find Your Next Experience Buddy</h1>
 
-      {/* Search and Filter Form */}
-      {/* Using GET method for simple filtering via URL params */}
-      <form method="GET" action="/experiences" className="mb-8 p-4 border rounded-lg bg-card shadow">
+      {/* Search and Filter Form - Use the server action */}
+      <form action={handleSearch} className="mb-8 p-4 border rounded-lg bg-card shadow-sm">
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
            {/* Keyword Search */}
            <div className="space-y-1 col-span-1 sm:col-span-2 lg:col-span-1">
@@ -166,14 +90,13 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
           {/* Category Filter */}
            <div className="space-y-1">
              <label htmlFor="category" className="text-sm font-medium">Category</label>
-              {/* Hidden input needed for GET form submission if Select isn't named */}
-             {/* <input type="hidden" name="category" value={searchParams?.category || 'all'} /> */}
              <Select name="category" defaultValue={searchParams?.category as string || 'all'}>
                 <SelectTrigger id="category" className="bg-background">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(cat => (
+                     // Use lowercase value for consistency
                     <SelectItem key={cat} value={cat.toLowerCase()}>{cat}</SelectItem>
                   ))}
                 </SelectContent>
@@ -185,20 +108,14 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
           <Button type="submit" className="w-full sm:w-auto btn-subtle-animate col-span-1 sm:col-span-2 lg:col-span-1">
             <Search className="mr-2 h-4 w-4" /> Search
           </Button>
-           {/* Add More Filters Button (Future) */}
-           {/*
-           <Button type="button" variant="outline" className="w-full sm:w-auto">
-             <SlidersHorizontal className="mr-2 h-4 w-4" /> More Filters
-           </Button>
-            */}
          </div>
       </form>
 
 
       {/* Experiences Grid */}
-      {experiences.length > 0 ? (
+      {filteredExperiences.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-          {experiences.map((exp) => (
+          {filteredExperiences.map((exp) => (
             <ExperienceCard key={exp.id} experience={exp} />
           ))}
         </div>
@@ -209,7 +126,7 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
         </div>
       )}
 
-       {/* TODO: Add Pagination */}
+       {/* TODO: Add Pagination if the list grows large */}
     </div>
   );
 }
