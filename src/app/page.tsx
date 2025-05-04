@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ExperienceCard } from '@/components/ExperienceCard';
 import type { Experience } from '@/lib/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Search, Users } from 'lucide-react'; // Import Search icon
 
 // TODO: Replace with actual data fetching
 const featuredExperiences: Experience[] = [
