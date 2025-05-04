@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light"> {/* Ensure light mode default or manage theme */}
+    <html lang="en" className="light">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <div className="relative flex min-h-screen flex-col">
           <Header />
