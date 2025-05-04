@@ -22,7 +22,7 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
-import { useRouter, isRedirectError } from 'next/navigation'; // Use next/navigation for App Router and error checking
+import { useRouter } from 'next/navigation'; // Use next/navigation for App Router
 import { createExperienceAction } from '@/app/actions'; // Import the server action
 import { useState } from 'react'; // Import useState for loading state
 
@@ -94,7 +94,8 @@ export default function CreateExperiencePage() {
       console.log("Client: Received result from server action:", result);
 
       // Server action handles successful redirection via throwing a redirect error.
-      // Handle only explicit non-success results returned from the action here.
+      // This error is handled by the Next.js framework itself.
+      // We only handle explicit non-success results returned from the action here.
       if (result && !result.success) {
          toast({
            title: 'Error Creating Experience',
@@ -117,31 +118,21 @@ export default function CreateExperiencePage() {
             });
          }
       }
-      // NOTE: If the action succeeds and redirects, it will throw an error
-      // caught by the `catch` block below. We don't need an explicit success case here.
+      // If the action was successful and redirected, the framework handles it,
+      // and code execution might not reach here if the redirect is immediate.
+      // If the action was successful but didn't redirect (which it should),
+      // we might want a success toast here, but currently, the action redirects.
 
     } catch (error) {
-      // Catch errors during action execution
-      // Check if it's a redirect error thrown by the server action
-      if (isRedirectError(error)) {
-         // Redirect is happening, show success toast.
-         toast({
-             title: 'Experience Created!',
-             description: `"${data.title}" has been listed. Redirecting...`,
-             variant: 'default',
-          });
-         // Re-throw the error to let Next.js handle the actual redirect.
-         // DO NOT call router.push() here.
-         throw error;
-      } else {
-        // Handle unexpected errors (e.g., network issues, server crashes)
-        console.error("Client: Unexpected error during form submission:", error);
-        toast({
-          title: 'An Unexpected Error Occurred',
-          description: 'Could not create experience. Please try again.',
-          variant: 'destructive',
-        });
-      }
+      // Catch *unexpected* errors during action execution.
+      // Redirect errors thrown by `redirect()` in the server action are
+      // handled by the Next.js framework and should not reach this catch block.
+      console.error("Client: Unexpected error during form submission:", error);
+      toast({
+        title: 'An Unexpected Error Occurred',
+        description: 'Could not create experience. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false); // Reset loading state regardless of outcome
     }
